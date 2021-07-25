@@ -18,8 +18,8 @@ for (const file of commandFiles) {
 //Ready
 bot.on("ready", () => {
   console.log(`Logged in as ${bot.user.tag}!`)
-  bot.user.setStatus('idle');
-  bot.user.setActivity('THE BUCKS WIN A TITLE 🔥', {type: 'WATCHING'});
+  bot.user.setStatus('dnd');
+  bot.user.setActivity('BASKETBALL WITH BOBBY PORTIS', {type: 'PLAYING'});
 })
 //Commands
 bot.on('message', async message => {
@@ -52,7 +52,16 @@ if(command==="help"){
 }
 //Purge
 if (command === "delete") {
-  bot.commands.get("delete").execute(message, args)
+  if (message.member.hasPermission("MANAGE_MESSAGES")) {
+	bot.commands.get("delete").execute(message, args)
+  }
+  else{
+    message.channel.send("You cant use that!")
+  }
+}
+//Flight Status
+if (command === "flight") {
+  bot.commands.get('flight').execute(message, args, Discord)
 }
 });
 //Spam DM
@@ -91,13 +100,23 @@ bot.on('message', message => {
 bot.on("message", message => {
   if (message.content.includes("uploaded a new youtube video!")) {
     message.channel.send("If you want your YouTube Channel to be shown here, ping NLHMS#2100.<:youtube:863441892947132436>");
-  }
-})
-bot.on("message", message => {
-  if (message.content.includes("is now streaming")) {
+  } 
+  else if (message.content.includes("is now streaming")) {
     message.channel.send("If you want your Twitch Channel to be shown here, ping NLHMS#2100.<a:twitch:863441893119885332>");
   }
 })
-
+//Disbale Invite Links in 2k for Switch
+bot.on("message", message => {
+  if (message.content.includes("discord.gg/"||"discord.gg/invite")) { 
+    if(message.guild.id == '800469764341366795')     
+    message.delete()
+    message.channel.send("No Promoting Discord Servers. Rule 4 <a:read_rules:853016245783887891>")
+    .then (message=>{
+    message.delete({timeout:5000})
+    })
+    const user =bot.users.cache.get('821736517012815882');
+    user.send('Someone sent an invite link O.o');
+  } 
+})
 keepAlive()
 bot.login(process.env.TOKEN)
