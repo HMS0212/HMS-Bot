@@ -1,2 +1,2 @@
-# HMS-Bot-Updated-
+# HMS-Bot
 Bot for Discord made by Hammad.S#0001
