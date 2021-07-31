@@ -12,12 +12,20 @@ module.exports = {
       const member = message.mentions.members.first();
       if (member.roles.cache.some(role => role.name === roles)){
         const hasroleembed=new Discord.MessageEmbed()
-        .setTitle("Add Role")
+        .setTitle("Has Role")
         .setColor("#5271ff")
         .setDescription(`${member} already has the ${role} role`)
         .setFooter("Add Role Command")
         .setTimestamp()
         message.channel.send(hasroleembed)
+      } else if(role === undefined){
+      const noroleembed=new Discord.MessageEmbed()
+        .setTitle("No Role")
+        .setColor("#5271ff")
+        .setDescription(`This role doesn't exist!`)
+        .setFooter("Add Role Command")
+        .setTimestamp()
+        message.channel.send(noroleembed)  
       } else {
       member.roles.add(role);
       const addroleembed=new Discord.MessageEmbed()
