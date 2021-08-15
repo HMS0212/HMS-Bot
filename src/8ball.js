@@ -5,7 +5,7 @@ module.exports = {
   execute(message, args, Discord) {
     let question = args[0]
     if (!question) {
-      message.channel.send("You will have to enter your question next to the command!")
+      message.channel.send("Make sure you have a question after")
     }
     else {
 

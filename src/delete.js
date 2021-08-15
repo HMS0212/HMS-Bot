@@ -2,6 +2,9 @@ module.exports = {
   name: 'delete',
   description: "Used to delete messages a channel",
   async execute(message, args) {
+    if(!args.length){
+      message.channel.send("Make sure you have the number of messages you want to delete after")
+    } else{
 
     try {
 
@@ -18,12 +21,12 @@ module.exports = {
         setTimeout(()=>message.delete(), 10000)
       })
 
+    
     }
-
     catch(e) { 
       console.log(e)
       message.channel.send("Something went wrong.. please try again.")
     }
-
+    }
   }
 }

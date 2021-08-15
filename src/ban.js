@@ -6,7 +6,6 @@ module.exports = {
   execute(message, args, Discord) {
     const user = message.mentions.users.first();
     message.guild.members.ban(user);
-
     const banembed=new Discord.MessageEmbed()
   .setTitle("Ban")
   .setColor("#5271ff")

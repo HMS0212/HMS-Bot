@@ -2,7 +2,9 @@ module.exports = {
   name: 'weather',
   description: "Used to get the weather of a place",
   execute(message, args, Discord, weather) {
-
+    if(!args.length){
+      mesage.channel.send("Make sure you have a city after")
+    } else{
     const city = args[0]
 
     weather.find({search: args.join(" "), degreeType: "C"}, function(error, result){
@@ -31,6 +33,6 @@ module.exports = {
       message.channel.send(embed)
 
     })
-
+    }
   }
 }
