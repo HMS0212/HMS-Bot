@@ -5,7 +5,7 @@ module.exports = {
   description: "flight cmd",
   execute(message, args, Discord) {
   if(!args.length){
-      message.channel.send("Make sure you have a flight number after.")
+      message.channel.send("Make sure you have a flight number after")
   } else if(args){
     const flightembed=new Discord.MessageEmbed()
   .setTitle(`Flight Link for ${args}`)

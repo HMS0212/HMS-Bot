@@ -5,7 +5,7 @@ module.exports = {
   description: "adds a role to a user",
   execute(message, args, Discord) {
     if(!args.length){
-      message.channel.send("Make sure you have someone mentioned and a role")
+      message.channel.send("Make sure you have a user mentioned and a role after")
     } else if(args){
       const roles=args.slice(1).join(' ')
       const role = message.guild.roles.cache.find(role => role.name === roles);

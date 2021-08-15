@@ -7,7 +7,7 @@ module.exports = {
   execute(message, args, Discord) {
     
     if(!args.length){
-      message.channel.send("Make sure you have someone mentioned and a message")
+      message.channel.send("Make sure you have a user mentioned and a message after")
     }
     else if(args){
       const user = bot.users.fetch(message.mentions.users.first().id)

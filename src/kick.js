@@ -4,7 +4,7 @@ module.exports = {
   name: 'kick',
   description: "kicks a user",
   execute(message, args, Discord) {
-    const member = message.mentions.members.first();
+    const member = message.mentions.members.first()
     member.kick();
 
     const kickembed=new Discord.MessageEmbed()

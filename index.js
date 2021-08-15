@@ -3,10 +3,13 @@ const Discord = require("discord.js")
 const keepAlive = require("./server")
 const weather = require('weather-js')
 const Database = require("@replit/database")
-const fetch = require("node-fetch")
+const fetch = require("node-fetch");
 const bot = new Discord.Client();
 const db = require('quick.db')
-const PREFIX='!';
+const PREFIX="!"
+const Enmap = require("enmap")
+const canvacord = require("canvacord")
+bot.points = new Enmap({ name: "points" });
 //Commands Stuff
 const fs = require('fs');
 bot.commands = new Discord.Collection();
@@ -18,9 +21,14 @@ for (const file of commandFiles) {
 //Ready
 bot.on("ready", () => {
   console.log(`Logged in as ${bot.user.tag}!`)
-  bot.user.setStatus('dnd');
-  bot.user.setActivity('!help', {type: 'PLAYING'});
-})
+  bot.user.setPresence({
+        activity: { 
+            name: '7 Servers with 492 Members',
+            type: 'WATCHING'
+        },
+        status: 'idle'
+    })
+  })
 //Commands
 bot.on('message', async message => {
 if (!message.content.startsWith(PREFIX)) return;
@@ -52,7 +60,7 @@ if(command==="help"){
 }
 //Purge
 if (command === "delete") {
-  if (message.member.hasPermission("MANAGE_MESSAGES")||message.author.id==='821736517012815882'||message.author.id==='782391596648759296') {
+  if (message.member.hasPermission("MANAGE_MESSAGES", "ADMINISTRATOR")||message.author.id==='821736517012815882'||message.author.id==='782391596648759296') {
 	bot.commands.get("delete").execute(message, args)
   }
   else{
@@ -96,67 +104,59 @@ if (command === "kick") {
 }
 //Add Role
 if (command === "addrole") {
-  if (message.member.hasPermission("MANAGE_ROLES")||message.author.id==='821736517012815882'||message.author.id==='782391596648759296') {
+  if (message.member.hasPermission("MANAGE_ROLES","ADMINISTRATOR")||message.author.id==='821736517012815882'||message.author.id==='782391596648759296') {
 	bot.commands.get("addrole").execute(message, args, Discord)
   }
   else{
     message.channel.send("You cant use that!")
   }
 }
-});
-//Spam DM
-bot.on('message', message=>{
-  if(message.content.includes("kljhiuyft")){
-    const user = bot.users.fetch("691348965945245781").then(user => {
-      user.send("N.L ON TOP!😈<a:100gif:860208013067812885>")
-    })
-    message.channel.send("DM Sent")
+//Remove Role
+if (command === "removerole") {
+  if (message.member.hasPermission("MANAGE_ROLES","ADMINISTRATOR")||message.author.id==='821736517012815882'||message.author.id==='782391596648759296') {
+	bot.commands.get("removerole").execute(message, args, Discord)
   }
-})
+  else{
+    message.channel.send("You cant use that!")
+  }
+}
+//Avatar
+if (command === "avatar"){
+  bot.commands.get('avatar').execute(message, args, Discord)
+}
+//Create Channel
+if (command === "cchannel"){
+  bot.commands.get('cchannel').execute(message, args, Discord)
+}
+//Delete Channel
+if (command === "dchannel"){
+    bot.commands.get('dchannel').execute(message, args, Discord)
+}
+if (command === "restart"){
+  bot.commands.get('restart').execute(message, args, Discord)
+}
+});
 //Snipe
-bot.on('messageDelete', async (message) => {
-    db.set(`snipemsg_${message.channel.id}`, message.content)
-    db.set(`snipesender_${message.channel.id}`, message.author.id)
-})
-
-bot.on('message', message => {
-    if(message.content === '!snipe') {
-        let msg = db.get(`snipemsg_${message.channel.id}`)
-        let senderid = db.get(`snipesender_${message.channel.id}`)
-        if(!msg) {
-            return message.channel.send(`There is nothing to snipe smh.`)
-        }
-        let snipeembed = new Discord.MessageEmbed()
-        .setTitle(bot.users.cache.get(senderid).username)
-        .setDescription(msg)
-        .setThumbnail("https://creazilla-store.fra1.digitaloceanspaces.com/emojis/53918/camera-with-flash-emoji-clipart-xl.png")
-        .setColor("#5271ff")
-        .setTimestamp()
-        .setFooter("Snipe Command")
-        message.channel.send(snipeembed)
-    }
-})
-//YT and Twitch Promo
+const sniping = require("./src/snipe");
+sniping(bot)
+//YT and Twitch Promo and Disable Invite Links
 bot.on("message", message => {
-  if (message.content.includes("uploaded a new youtube video!")) {
+  if (message.content.includes("uploaded a new youtube video!")&&message.guild.id == '800469764341366795') {
     message.channel.send("If you want your YouTube Channel to be shown here, ping NLHMS#2100.<:youtube:863441892947132436>");
   } 
-  else if (message.content.includes("is now streaming")) {
+  else if (message.content.includes("is now streaming")&&message.guild.id == '800469764341366795') {
     message.channel.send("If you want your Twitch Channel to be shown here, ping NLHMS#2100.<a:twitch:863441893119885332>");
   }
-})
-//Disbale Invite Links in 2k for Switch
-bot.on("message", message => {
-  if (message.content.includes("discord.gg/"||"discord.gg/invite")) { 
-    if(message.guild.id == '800469764341366795')     
+  else if(message.content.includes("discord.gg/"||"discord.gg/invite")&&message.guild.id == '800469764341366795'){
     message.delete()
     message.channel.send("No Promoting Discord Servers. Rule 4 <a:read_rules:853016245783887891>")
     .then (message=>{
     message.delete({timeout:5000})
     })
+    const user2=message.author.id
     const user =bot.users.cache.get('821736517012815882');
-    user.send('Someone sent an invite link O.o');
-  } 
+    user.send(`${user2} sent an invite link O.o`);
+  }
 })
 //Welcome
 bot.on('guildMemberAdd', member => {
@@ -177,5 +177,21 @@ bot.on('guildMemberRemove', member => {
     member.guild.channels.cache.get('846947148012716042').send(`${member} just lost his virginity and fucked off`);
   } 
 });
+//Banned Hey Lol
+bot.on('guildMemberAdd', member => {
+  if(member.guild.id == '816838874549583883'){
+    member.ban()
+  }
+});
+//Welcome 
+bot.on('guildMemberAdd', member=>{
+  if(member.guild.id == '875049238504038400'){
+    member.guild.channels.cache.get('875049238504038403').send(`${member} just joined. We should check out the situation. <:suseyes:875058230089371658>`);
+  }
+})
+//Ranking
+const leveling = require("./src/ranking");
+leveling(bot)
+
 keepAlive()
 bot.login(process.env.TOKEN)
