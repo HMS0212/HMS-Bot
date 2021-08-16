@@ -27,7 +27,6 @@ module.exports = {
         .setTimestamp()
         message.channel.send(noroleembed)  
       } else {
-      member.roles.add(role);
       const addroleembed=new Discord.MessageEmbed()
       .setTitle("Add Role")
       .setColor("#5271ff")
@@ -35,6 +34,12 @@ module.exports = {
       .setFooter("Add Role Command")
       .setTimestamp()
       message.channel.send(addroleembed)
+      member.roles.add(role).catch(error => {
+        if (error.code == Discord.Constants.APIErrors.MISSING_PERMISSIONS) {
+          console.log('Add Role Command Error')
+          message.channel.bulkDelete(1)
+          message.channel.send("There was an error, HMS role is too low in the hierarchy")
+          }});
       }
     }
   }
