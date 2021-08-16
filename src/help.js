@@ -1,21 +1,105 @@
-const Discord = require("discord.js")
-const fetch = require("node-fetch")
-const bot = new Discord.Client();
+const Discord=require('discord.js')
+const categories = [
+  {
+    emoji: '1️⃣',
+    name: 'Fun Commands',
+    color: "#5271ff",
+    title: 'Fun Commands',
+    description: 'Use these commands for fun',
+    commands:[
+      {
+        name:'\u200b',
+        value:'1. 8Ball+Question\n2.DM+User+Message\n3. Flight+Flight Number\n4. Joke\n5. Quote\n 6. Snipe\n 7. Weather+City\n 8. Avatar+User',
+      },
+    ],
+  },
+  {
+    emoji: '2️⃣',
+    name: 'Utility Commands',
+    color: "#5271ff",
+    title: 'Utility Commands',
+    description: 'Use these commands for moderation and other things',
+    commands:[
+      {
+        name:'\u200b',
+        value:'1. AddRole+User+Role\n2. RemoveRole+User+Role\n3. Ban+User\n4. Delete+Messages to Delete\n5. Kick+User\n6. Unban+User ID',
+      },
+    ],
+  },
+  {
+    emoji: '3️⃣',
+    name: 'Custom',
+    color: "#5271ff",
+    title: 'Custom Commands',
+    description: 'Request these commands for your server',
+    commands: [
+      {
+        name: '\u200b',
+        value: '1. Disable Invites\n2. Welcome Message\n3. Leave Message\n4. Rank\n5. Leaderboard',
+      },
+    ],
+  },
+];
+
 module.exports = {
   name: 'help',
-  description: "shows the help message",
-  execute(message, args, Discord) {
-    const helpembed= new Discord.MessageEmbed()
-  .setTitle("Commands for HMS Bot")
-  .setColor("#5271ff")
-  .setDescription(`Thanks for using HMS Bot! The prefix for this bot is "!". This bot has many features that can be used. If u have something you would like to add, DM Hammad.S#0001`)
-  .addField('Fun','The commands include:\n1. 8Ball+Question\n2.DM+User+\nMessage\n3. Flight+Flight Number\n4. Joke\n 5. Quote\n 6. Snipe\n 7. Weather+City\n 8. Avatar+User',true)
-  .addField('Utilities','The commands include:\n1. AddRole+\nUser+Role\n2. RemoveRole+\nUser+Role\n3. Ban+User\n4. Delete+Messages to Delete\n5. Kick+User\n6. Unban+User ID',true)
-  .addField('Custom','Request these for your server:\n1. Disable Invites\n2. Welcome Message\n3. Leave Message\n4. Rank\n5. Leaderboard',true)
-  .setThumbnail('https://i.ibb.co/TBHfwsw/Neon-Light-Glow-Vegan-Noodles-Logo-2.png')
-  .setFooter("Help Command")
-  .setTimestamp()
-    message.channel.send(helpembed)
-  }
-}
-bot.login(process.env.TOKEN)
+  description: 'Overview of all commands!',
+  execute(message, args) {
+    const embed = new Discord.MessageEmbed()
+      .setColor("#5271ff")
+      .setTitle('Commands for HMS Bot')
+      .setDescription('Thanks for using HMS Bot! The prefix for this bot is "!". If u have something you would like to add, DM Hammad.S#0001. React to the message to see commands of a specific category!')
+      .addFields(
+        // add fields for each category
+        categories.map((cat) => ({
+          name: `${cat.emoji}   ${cat.name}`,
+          value: '\u200b',
+        }))
+      )
+      .setFooter('Help Command')
+      .setThumbnail('https://i.ibb.co/TBHfwsw/Neon-Light-Glow-Vegan-Noodles-Logo-2.png')
+      .setTimestamp();
+
+    message.channel.send(embed).then((embedMsg) => {
+      // send reactions for each emojis
+      const emojis = categories.map((cat) => cat.emoji);
+      emojis.forEach((emoji) => embedMsg.react(emoji));
+
+      // the filter checks if the reaction emoji is in the categories
+      // it also checks if the person who reacted shares the same id
+      // as the author of the original message
+      const filter = (reaction, user) =>
+        emojis.includes(reaction.emoji.name) && user.id === message.author.id;
+
+      const collector = embedMsg.createReactionCollector(filter, {
+        // max number of reactions is the number of categories
+        max: emojis.length,
+        // it won't accept reactions after 60 seconds
+        // optional, you can remove/change it
+        time: 30000,
+      });
+
+      collector.on('collect', (reaction, user) => {
+        // find the category by its emoji
+        const selectedCategory = categories.find(
+          (category) => category.emoji === reaction.emoji.name,
+        );
+
+        if (!selectedCategory) {
+          return message.channel.send('Oops, there was an error... Try again?!');
+        }
+
+        const embed = new Discord.MessageEmbed()
+          .setColor(selectedCategory.color)
+          .setTitle(selectedCategory.title)
+          .setDescription(selectedCategory.description)
+          .addFields(selectedCategory.commands)
+          .setFooter('Help Command')
+          .setThumbnail('https://i.ibb.co/TBHfwsw/Neon-Light-Glow-Vegan-Noodles-Logo-2.png')
+          .setTimestamp();
+          embedMsg.delete();
+          message.channel.send(embed);
+      });
+    });
+  },
+};
