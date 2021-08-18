@@ -4,6 +4,9 @@ module.exports = {
   name: 'kick',
   description: "kicks a user",
   execute(message, args, Discord) {
+    if(!args.length){
+      message.channel.send("Make sure you have someone mentioned")
+    } else if(args){
     const member = message.mentions.members.first()
     member.kick();
 
@@ -14,5 +17,6 @@ module.exports = {
   .setFooter("Kick Command")
   .setTimestamp()
   message.channel.send(kickembed)
+  }
   }
 }

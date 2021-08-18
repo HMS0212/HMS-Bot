@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 module.exports = {
   name: '8ball',
   description: "8ball command",
-  execute(message, args, Discord) {
+  async execute(message, args, Discord) {
     let question = args[0]
     if (!question) {
       message.channel.send("Make sure you have a question after")

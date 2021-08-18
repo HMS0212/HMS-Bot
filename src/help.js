@@ -35,7 +35,20 @@ const categories = [
     commands: [
       {
         name: '\u200b',
-        value: '1. Disable Invites\n2. Welcome Message\n3. Leave Message\n4. Rank\n5. Leaderboard',
+        value: '1. Disable Invites(setconf invites on/off)\n2. Welcome Message\n3. Leave Message\n4. Rank and Leaderboard',
+      },
+    ],
+  },
+  {
+    emoji: '4️⃣',
+    name: 'Music Commands',
+    color: "#5271ff",
+    title: 'Music Commands',
+    description: 'Use these commands for playing music',
+    commands:[
+      {
+        name:'\u200b',
+        value:'1. Play+Song\n2. Skip\n3. Queue\n4. Pause\n5. Resume\n6. Jump+Number\n7. Disconnect\n8. Loop\n9. Shuffle\n10. Volume+Number\n11. Autoplay',
       },
     ],
   },
