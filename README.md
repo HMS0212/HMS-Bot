@@ -30,7 +30,7 @@ Unban Command
 
 Delete Messages Command
 
-Levels for Server's
+Levels for Servers
 
 Disable Invites in a Server
 
