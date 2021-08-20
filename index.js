@@ -18,7 +18,8 @@ bot.settings = new Enmap({
   cloneLevel: 'deep'
 });
 const defaultSettings = {	
-  invites: "off"
+  invites: "off",
+  levels: "off"
 }
 //Commands Stuff
 const fs = require('fs');
