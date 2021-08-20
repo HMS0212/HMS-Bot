@@ -22,7 +22,7 @@ const categories = [
     commands:[
       {
         name:'\u200b',
-        value:'1. AddRole+User+Role\n2. RemoveRole+User+Role\n3. Ban+User\n4. Delete+Messages to Delete\n5. Kick+User\n6. Unban+User ID',
+        value:'1. AddRole+User+Role\n2. RemoveRole+User+Role\n3. Ban+User\n4. Delete+Messages to Delete\n5. Kick+User\n6. Unban+User ID\n7. Create Channel(Cchannel+type+name)\n8. Delete Channel(Dchannel [Deletes channel you are currently in, DOES NOT WORK FOR VOICE CHANNEL])',
       },
     ],
   },
@@ -35,7 +35,7 @@ const categories = [
     commands: [
       {
         name: '\u200b',
-        value: '1. Disable Invites(setconf invites on/off)\n2. Welcome Message\n3. Leave Message\n4. Rank and Leaderboard',
+        value: '1. Disable Invites(setconf invites on/off)\n2. Rank and Leaderboard(setconf levels on/off)'
       },
     ],
   },

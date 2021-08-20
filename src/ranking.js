@@ -1,27 +1,40 @@
-const PREFIX = "!";
-const canvacord = require("canvacord");
-const Discord = require("discord.js");
-const client=new Discord.Client()
-module.exports = function (client) {
+const Discord = require("discord.js")
+const fetch = require("node-fetch");
+const bot = new Discord.Client();
+const PREFIX="!"
+const Enmap = require("enmap")
+const canvacord = require("canvacord")
+bot.points = new Enmap({ name: "points" });
+bot.settings = new Enmap({
+  name: "settings",
+  fetchAll: false,
+  autoFetch: true,
+  cloneLevel: 'deep'
+});
+const defaultSettings = {	
+  invites: "off",
+  levels: "off"
+}
+module.exports = function (bot) {
   const description = {
     name: "leveling",
     filename: "leveling.js",
     version: "2.0"
   }
   //voice state update event to check joining/leaving channels
-  client.on("message", async (message) => {
-
+  bot.on("message", async (message) => {
+    const guildConf = bot.settings.ensure(message.guild.id, defaultSettings);
     if (message.author.bot) return;
     if (!message.guild) return;
     if (message.channel.type === `dm`) return;
-    if(message.guild.id===`816838874549583883`||message.guild.id===`833461324998115390`||message.guild.id==='875049238504038400'){
+    if(guildConf.levels == "on"){
     //////////////////////////////////////////
     /////////////RANKING SYSTEM///////////////
     //////////////////////////////////////////
     //get the key of the user for this guild
     const key = `${message.guild.id}-${message.author.id}`;
     // do some databasing
-    client.points.ensure(`${message.guild.id}-${message.author.id}`, {
+    bot.points.ensure(`${message.guild.id}-${message.author.id}`, {
       user: message.author.id,
       guild: message.guild.id,
       points: 0,
@@ -34,45 +47,45 @@ module.exports = function (client) {
       //get a random num between 0 and 2 rounded
       var randomnum =Math.floor(Math.random() * 20)+1
       //basically databasing again
-      client.points.math(key, `+`, randomnum, `points`)
-      client.points.inc(key, `points`);
+      bot.points.math(key, `+`, randomnum, `points`)
+      bot.points.inc(key, `points`);
     }
     //if not too short do this
     else {
       //get a random num between rounded but it belongs to message length
       var randomnum = Math.floor(Math.random() * 10)+1
       //basically databasing again
-      client.points.math(key, `+`, randomnum, `points`)
-      client.points.inc(key, `points`);
+      bot.points.math(key, `+`, randomnum, `points`)
+      bot.points.inc(key, `points`);
     }
     //get current level
-    const curLevel = Math.floor(0.1 * Math.sqrt(client.points.get(key, `points`)));
+    const curLevel = Math.floor(0.1 * Math.sqrt(bot.points.get(key, `points`)));
     //if its a new level then do this
-    if (client.points.get(key, `level`) < curLevel) {
+    if (bot.points.get(key, `level`) < curLevel) {
       //define ranked embed
       const embed = new Discord.MessageEmbed()
         .setTitle(`Ranking of:  ${message.author.username}`)
         .setTimestamp()
-        .setDescription(`You've leveled up to Level: **\`${curLevel}\`**! (Points: \`${Math.floor(client.points.get(key, `points`) * 100) / 100}\`) `)
+        .setDescription(`You've leveled up to Level: **\`${curLevel}\`**! (Points: \`${Math.floor(bot.points.get(key, `points`) * 100) / 100}\`) `)
         .setColor("#5271ff");
       //send ping and embed message
       message.author.send(embed);
       //set the new level
-      client.points.set(key, curLevel, `level`);
+      bot.points.set(key, curLevel, `level`);
     }
     //else continue or commands...
     //
     if (message.content.toLowerCase().startsWith(`${PREFIX}rank`)) {
       //get the rankuser
       let rankuser = message.mentions.users.first() || message.author;
-      client.points.ensure(`${message.guild.id}-${rankuser.id}`, {
+      bot.points.ensure(`${message.guild.id}-${rankuser.id}`, {
         user: message.author.id,
         guild: message.guild.id,
         points: 0,
         level: 1
       });
       //do some databasing
-      const filtered = client.points.filter(p => p.guild === message.guild.id).array();
+      const filtered = bot.points.filter(p => p.guild === message.guild.id).array();
       const sorted = filtered.sort((a, b) => b.points - a.points);
       const top10 = sorted.splice(0, message.guild.memberCount);
       let i = 0;
@@ -80,7 +93,7 @@ module.exports = function (client) {
       for (const data of top10) {
         try {
           i++;
-          if (client.users.cache.get(data.user).tag === rankuser.tag) break;
+          if (bot.users.cache.get(data.user).tag === rankuser.tag) break;
         } catch {
           i = `Error counting Rank`;
           break;
@@ -88,11 +101,11 @@ module.exports = function (client) {
       }
       const key = `${message.guild.id}-${rankuser.id}`;
       //math
-      let curpoints = Number(client.points.get(key, `points`).toFixed(2));
+      let curpoints = Number(bot.points.get(key, `points`).toFixed(2));
       //math
-      let curnextlevel = Number(((Number(1) + Number(client.points.get(key, `level`).toFixed(2))) * Number(10)) * ((Number(1) + Number(client.points.get(key, `level`).toFixed(2))) * Number(10)));
+      let curnextlevel = Number(((Number(1) + Number(bot.points.get(key, `level`).toFixed(2))) * Number(10)) * ((Number(1) + Number(bot.points.get(key, `level`).toFixed(2))) * Number(10)));
       //if not level == no rank
-      if (client.points.get(key, `level`) === undefined) i = `No Rank`;
+      if (bot.points.get(key, `level`) === undefined) i = `No Rank`;
       //global local color var.
       let color='#5271ff';
       //define the ranking card
@@ -106,7 +119,7 @@ module.exports = function (client) {
         .setLevelColor('#5271ff', "COLOR")
         .setUsername(rankuser.username, '#5271ff')
         .setRank(Number(i), "Rank", true)
-        .setLevel(Number(client.points.get(key, `level`)), "Level", true)
+        .setLevel(Number(bot.points.get(key, `level`)), "Level", true)
         .setDiscriminator(rankuser.discriminator, '#5271ff');
       rank.build()
         .then(async data => {
@@ -119,7 +132,7 @@ module.exports = function (client) {
     //leaderboard command
     if (message.content.toLowerCase() === `${PREFIX}leaderboard`||message.content.toLowerCase() === `${PREFIX}lb`) {
       //some databasing and math
-      const filtered = client.points.filter(p => p.guild === message.guild.id).array();
+      const filtered = bot.points.filter(p => p.guild === message.guild.id).array();
       const sorted = filtered.sort((a, b) => b.points - a.points);
       const top10 = sorted.splice(0, 10);
       const embed = new Discord.MessageEmbed()
@@ -133,10 +146,10 @@ module.exports = function (client) {
       for (const data of top10) {
       try {
           i++;
-          embed.addField(`**${i}**. ${client.users.cache.get(data.user).tag}`, `Points: \`${Math.floor(data.points * 100) / 100}\` | Level: \`${data.level}\``);
+          embed.addField(`**${i}**. ${bot.users.cache.get(data.user).tag}`, `Points: \`${Math.floor(data.points * 100) / 100}\` | Level: \`${data.level}\``);
         } catch {
           i++; //if usernot found just do this
-          embed.addField(`**${i}**. ${client.users.cache.get(data.user)}`, `Points: \`${Math.floor(data.points * 100) / 100}\` | Level: \`${data.level}\``);
+          embed.addField(`**${i}**. ${bot.users.cache.get(data.user)}`, `Points: \`${Math.floor(data.points * 100) / 100}\` | Level: \`${data.level}\``);
         }
       }
       //schick das embed
